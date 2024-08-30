@@ -69,25 +69,29 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         .attr("class", "links")
         .selectAll("line");
 
+    // Calculate node size based on label length
+    const getNodeSize = (label) => Math.max(20, label.length * 4);
+
     // Draw nodes
     const node = g.append("g")
         .attr("class", "nodes")
         .selectAll("circle")
         .data(nodes)
         .enter().append("circle")
-        .attr("r", 5)
+        .attr("r", d => getNodeSize(d.label) / 2)
         .attr("fill", "#69b3a2");
 
-    // Add labels
+    // Add labels inside nodes
     const label = g.append("g")
         .attr("class", "labels")
         .selectAll("text")
         .data(nodes)
         .enter().append("text")
         .text(d => d.label)
-        .attr("font-size", 10)
-        .attr("dx", 8)
-        .attr("dy", 3);
+        .attr("font-size", d => Math.min(10, getNodeSize(d.label) / 3))
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "central")
+        .attr("fill", "white");
 
     // Update the graph
     function updateGraph(numNeighbors) {

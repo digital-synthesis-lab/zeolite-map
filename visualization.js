@@ -36,8 +36,16 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
     const svg = d3.select("#visualization")
         .append("svg")
         .attr("width", width)
+        .attr("height", height);
+
+    // Add a background rect for better zoom/pan interaction
+    svg.append("rect")
+        .attr("width", width)
         .attr("height", height)
-        .append("g")
+        .style("fill", "none")
+        .style("pointer-events", "all");
+
+    const g = svg.append("g")
         .attr("class", "zoom-container");
 
     // Add zoom behavior
@@ -54,7 +62,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         .force("center", d3.forceCenter(width / 2, height / 2));
 
     // Draw links
-    const link = svg.append("g")
+    const link = g.append("g")
         .attr("class", "links")
         .selectAll("line")
         .data(links)
@@ -63,7 +71,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         .attr("stroke-opacity", 0.6);
 
     // Draw nodes
-    const node = svg.append("g")
+    const node = g.append("g")
         .attr("class", "nodes")
         .selectAll("circle")
         .data(nodes)
@@ -72,7 +80,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         .attr("fill", "#69b3a2");
 
     // Add labels
-    const label = svg.append("g")
+    const label = g.append("g")
         .attr("class", "labels")
         .selectAll("text")
         .data(nodes)
@@ -101,7 +109,6 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     // Zoom function
     function zoomed(event) {
-        svg.selectAll(".links, .nodes, .labels")
-            .attr("transform", event.transform);
+        g.attr("transform", event.transform);
     }
 });

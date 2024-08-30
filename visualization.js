@@ -60,7 +60,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     // Create initial force simulation
     let simulation = d3.forceSimulation(nodes)
-        .force("charge", d3.forceManyBody().strength(-200))
+        .force("charge", d3.forceManyBody().strength(-30))
         .force("center", d3.forceCenter(width / 2, height / 2));
 
     // Initialize with 4 nearest neighbors
@@ -68,14 +68,6 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
     let link = g.append("g")
         .attr("class", "links")
         .selectAll("line");
-
-    // Create all possible links for repulsion
-    const allPossibleLinks = [];
-    for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-            allPossibleLinks.push({source: nodes[i], target: nodes[j]});
-        }
-    }
 
     // Calculate node size based on label length
     const getNodeSize = (label) => Math.max(20, label.length * 4);
@@ -112,21 +104,9 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
             .attr("stroke-opacity", 0.6)
             .merge(link);
 
-        // Create a set of connected node pairs for quick lookup
-        const connectedPairs = new Set(links.map(d => `${d.source.id}-${d.target.id}`));
-
         // Update forces
         simulation
-            .force("link", d3.forceLink(allPossibleLinks).id(d => d.id)
-                .strength(d => {
-                    const key = `${d.source.id}-${d.target.id}`;
-                    return connectedPairs.has(key) ? 0.7 : -0.1;
-                })
-                .distance(d => {
-                    const key = `${d.source.id}-${d.target.id}`;
-                    return connectedPairs.has(key) ? 100 : 200;
-                })
-            )
+            .force("link", d3.forceLink(links).id(d => d.id).distance(100))
             .alpha(1)
             .restart();
     }

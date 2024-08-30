@@ -31,12 +31,21 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
     }
 
     // Set up the SVG
-    const width = 800;
+    const width = document.getElementById('visualization').clientWidth;
     const height = 600;
     const svg = d3.select("#visualization")
         .append("svg")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .append("g")
+        .attr("class", "zoom-container");
+
+    // Add zoom behavior
+    const zoom = d3.zoom()
+        .scaleExtent([0.1, 10])
+        .on("zoom", zoomed);
+
+    svg.call(zoom);
 
     // Create a force simulation
     const simulation = d3.forceSimulation(nodes)
@@ -46,6 +55,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     // Draw links
     const link = svg.append("g")
+        .attr("class", "links")
         .selectAll("line")
         .data(links)
         .enter().append("line")
@@ -54,6 +64,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     // Draw nodes
     const node = svg.append("g")
+        .attr("class", "nodes")
         .selectAll("circle")
         .data(nodes)
         .enter().append("circle")
@@ -62,6 +73,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     // Add labels
     const label = svg.append("g")
+        .attr("class", "labels")
         .selectAll("text")
         .data(nodes)
         .enter().append("text")
@@ -86,4 +98,10 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
             .attr("x", d => d.x)
             .attr("y", d => d.y);
     });
+
+    // Zoom function
+    function zoomed(event) {
+        svg.selectAll(".links, .nodes, .labels")
+            .attr("transform", event.transform);
+    }
 });

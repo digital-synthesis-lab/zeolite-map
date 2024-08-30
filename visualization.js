@@ -1,5 +1,5 @@
 // Load the CSV file
-d3.csv("iza.csv").then(function(data) {
+d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.csv").then(function(data) {
     // Parse the CSV data into a distance matrix
     const matrix = data.map(row => Object.values(row).map(Number));
     const n = matrix.length;

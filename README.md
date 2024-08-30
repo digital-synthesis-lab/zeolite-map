@@ -37,8 +37,11 @@ This data has been produced for the following paper:
     title = {Inorganic synthesis-structure maps in zeolites with machine learning and crystallographic distances},
     author = {Schwalbe-Koda, Daniel, Widdowson, Daniel E., Pham, Tuan Anh, Kurlin, Vitaliy E.},
     year = {2023},
-    journal = {arXiv:2307.10935},
-    doi = {10.48550/arXiv.2307.10935},
-    url = {https://doi.org/10.48550/arXiv.2307.10935},
+    journal = {Digital Discovery},
+    volume = {2},
+    pages = {1911-1924},
+    doi = {10.1039/D3DD00134B},
+    url = {https://doi.org/10.1039/D3DD00134B},
     arxiv = {2307.10935},
 }
+```

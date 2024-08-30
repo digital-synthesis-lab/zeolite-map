@@ -14,20 +14,23 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
     // Create nodes with labels
     const nodes = labels.map((label, i) => ({id: i, label: label}));
 
-    // Find 4 nearest neighbors for each node
-    const links = [];
-    for (let i = 0; i < n; i++) {
-        const distances = matrix[i].map((d, j) => ({index: j, distance: d}));
-        distances.sort((a, b) => a.distance - b.distance);
-        for (let k = 1; k <= 4 && k < distances.length; k++) {
-            if (distances[k].index > i) {
-                links.push({
-                    source: i,
-                    target: distances[k].index,
-                    distance: distances[k].distance
-                });
+    // Function to create links based on number of nearest neighbors
+    function createLinks(numNeighbors) {
+        const links = [];
+        for (let i = 0; i < n; i++) {
+            const distances = matrix[i].map((d, j) => ({index: j, distance: d}));
+            distances.sort((a, b) => a.distance - b.distance);
+            for (let k = 1; k <= numNeighbors && k < distances.length; k++) {
+                if (distances[k].index > i) {
+                    links.push({
+                        source: i,
+                        target: distances[k].index,
+                        distance: distances[k].distance
+                    });
+                }
             }
         }
+        return links;
     }
 
     // Set up the SVG
@@ -55,20 +58,16 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     svg.call(zoom);
 
-    // Create a force simulation
-    const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.id).distance(d => d.distance * 10))
+    // Create initial force simulation
+    let simulation = d3.forceSimulation(nodes)
         .force("charge", d3.forceManyBody().strength(-30))
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-    // Draw links
-    const link = g.append("g")
+    // Initialize with 4 nearest neighbors
+    let links = createLinks(4);
+    let link = g.append("g")
         .attr("class", "links")
-        .selectAll("line")
-        .data(links)
-        .enter().append("line")
-        .attr("stroke", "#999")
-        .attr("stroke-opacity", 0.6);
+        .selectAll("line");
 
     // Draw nodes
     const node = g.append("g")
@@ -89,6 +88,22 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         .attr("font-size", 10)
         .attr("dx", 8)
         .attr("dy", 3);
+
+    // Update the graph
+    function updateGraph(numNeighbors) {
+        links = createLinks(numNeighbors);
+
+        link = link.data(links, d => `${d.source.id}-${d.target.id}`);
+        link.exit().remove();
+        link = link.enter().append("line")
+            .attr("stroke", "#999")
+            .attr("stroke-opacity", 0.6)
+            .merge(link);
+
+        simulation.force("link", d3.forceLink(links).id(d => d.id).distance(d => d.distance * 10))
+            .alpha(1)
+            .restart();
+    }
 
     // Update positions on each tick of the simulation
     simulation.on("tick", () => {
@@ -111,4 +126,19 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
     function zoomed(event) {
         g.attr("transform", event.transform);
     }
+
+    // Handle neighbor selection
+    d3.select("#neighbors").on("change", function() {
+        const numNeighbors = parseInt(this.value);
+        updateGraph(numNeighbors);
+    });
+
+    // Handle search
+    d3.select("#search").on("input", function() {
+        const searchTerms = this.value.toLowerCase().split(/[\s,]+/);
+        node.classed("highlighted", d => searchTerms.some(term => d.label.toLowerCase().includes(term)));
+    });
+
+    // Initial graph update
+    updateGraph(4);
 });

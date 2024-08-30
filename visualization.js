@@ -257,13 +257,19 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     function highlightPath(path) {
         // Reset previous highlighting
-        node.attr("fill", "#69b3a2");
-        link.attr("stroke", "#999").attr("stroke-width", 1);
+        node.attr("fill", "#69b3a2")
+            .attr("stroke", null)
+            .attr("stroke-width", null);
+        link.attr("stroke", "#999")
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", null);
 
         if (path) {
             // Highlight nodes in the path
             node.filter(d => path.includes(d.id))
-                .attr("fill", "#ffa500"); // Orange for path nodes
+                .attr("fill", "#ffa500") // Orange fill for path nodes
+                .attr("stroke", "#ff4500") // Red-orange stroke for path nodes
+                .attr("stroke-width", 3);
 
             // Highlight links in the path
             link.filter(d => {
@@ -271,8 +277,9 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
                 const targetIndex = path.indexOf(d.target.id);
                 return sourceIndex !== -1 && targetIndex !== -1 && Math.abs(sourceIndex - targetIndex) === 1;
             })
-                .attr("stroke", "#ffa500") // Orange for path links
-                .attr("stroke-width", 3);
+                .attr("stroke", "#ff4500") // Red-orange for path links
+                .attr("stroke-width", 3)
+                .attr("stroke-dasharray", "5,5"); // Dashed line for path links
         }
     }
 

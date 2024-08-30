@@ -109,6 +109,9 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
             .force("link", d3.forceLink(links).id(d => d.id).distance(100))
             .alpha(1)
             .restart();
+
+        // Reapply search highlighting
+        applySearch();
     }
 
     // Update positions on each tick of the simulation
@@ -139,9 +142,9 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         updateGraph(numNeighbors);
     });
 
-    // Handle search
-    d3.select("#search").on("input", function() {
-        const searchTerms = this.value.toLowerCase().trim().split(/[\s,]+/).filter(Boolean);
+    // Apply search highlighting
+    function applySearch() {
+        const searchTerms = d3.select("#search").property("value").toLowerCase().trim().split(/[\s,]+/).filter(Boolean);
         
         // Highlight selected nodes
         node.classed("highlighted", d => searchTerms.length > 0 && searchTerms.some(term => d.label.toLowerCase().includes(term)));
@@ -178,7 +181,10 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
                 return "#69b3a2"; // Original color for other nodes
             }
         });
-    });
+    }
+
+    // Handle search
+    d3.select("#search").on("input", applySearch);
 
     // Initial graph update
     updateGraph(4);

@@ -1,18 +1,25 @@
 // Load the CSV file
 d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.csv").then(function(data) {
+    // Get labels from the first column
+    const labels = data.map(row => row[Object.keys(row)[0]]);
+
     // Parse the CSV data into a distance matrix
-    const matrix = data.map(row => Object.values(row).map(Number));
+    const matrix = data.map(row => {
+        const values = Object.values(row);
+        return values.slice(1).map(Number);  // Exclude the first column (label)
+    });
+
     const n = matrix.length;
 
-    // Create nodes
-    const nodes = Array.from({length: n}, (_, i) => ({id: i}));
+    // Create nodes with labels
+    const nodes = labels.map((label, i) => ({id: i, label: label}));
 
     // Find 4 nearest neighbors for each node
     const links = [];
     for (let i = 0; i < n; i++) {
         const distances = matrix[i].map((d, j) => ({index: j, distance: d}));
         distances.sort((a, b) => a.distance - b.distance);
-        for (let k = 1; k <= 4; k++) {
+        for (let k = 1; k <= 4 && k < distances.length; k++) {
             if (distances[k].index > i) {
                 links.push({
                     source: i,
@@ -58,7 +65,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         .selectAll("text")
         .data(nodes)
         .enter().append("text")
-        .text(d => d.id)
+        .text(d => d.label)
         .attr("font-size", 10)
         .attr("dx", 8)
         .attr("dy", 3);

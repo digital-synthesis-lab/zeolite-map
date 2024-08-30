@@ -240,14 +240,18 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     // Handle path search
     d3.select("#findPath").on("click", function() {
-        const pathLabels = d3.select("#pathSearch").property("value").toLowerCase().trim().split(",").map(s => s.trim());
+        const pathLabels = d3.select("#pathSearch").property("value").toLowerCase().trim().split(/[\s,]+/).filter(Boolean);
         if (pathLabels.length === 2) {
             const startNode = nodes.find(n => n.label.toLowerCase() === pathLabels[0]);
             const endNode = nodes.find(n => n.label.toLowerCase() === pathLabels[1]);
             if (startNode && endNode) {
                 const path = findShortestPath(startNode.id, endNode.id);
                 highlightPath(path);
+            } else {
+                console.log("One or both nodes not found");
             }
+        } else {
+            console.log("Please enter exactly two labels");
         }
     });
 

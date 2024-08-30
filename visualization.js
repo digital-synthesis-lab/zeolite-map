@@ -1,5 +1,12 @@
 // Load the CSV file
 d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.csv").then(function(data) {
+    // Function to calculate percentile
+    function percentile(arr, value) {
+        const sorted = arr.slice().sort((a, b) => a - b);
+        const index = sorted.indexOf(value);
+        return (index / (sorted.length - 1)) * 100;
+    }
+
     // Function to find the shortest path between two nodes
     function findShortestPath(start, end) {
         const queue = [[start]];
@@ -253,13 +260,25 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
             if (startNode && endNode) {
                 const path = findShortestPath(startNode.id, endNode.id);
                 highlightPath(path);
+                
+                // Calculate and log the distance and percentile
+                const distance = matrix[startNode.id][endNode.id];
+                const allDistances = matrix.flat().filter(d => d > 0);
+                const distancePercentile = percentile(allDistances, distance);
+                
+                const logMessage = `Distance between ${startNode.label} and ${endNode.label}: ${distance.toFixed(4)}\n` +
+                                   `Percentile: ${distancePercentile.toFixed(2)}%`;
+                
+                d3.select("#logBox").property("value", logMessage);
             } else {
                 console.log("One or both nodes not found");
                 highlightPath(null);
+                d3.select("#logBox").property("value", "One or both nodes not found");
             }
         } else {
             console.log("Please enter exactly two labels");
             highlightPath(null);
+            d3.select("#logBox").property("value", "Please enter exactly two labels");
         }
     });
 

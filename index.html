@@ -11,6 +11,8 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
         }
         #sidebar {
             width: 250px;
@@ -22,10 +24,20 @@
         #main-content {
             flex-grow: 1;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
         }
         #visualization {
+            flex-grow: 1;
             width: 100%;
-            height: calc(100vh - 40px);
+            min-height: 60vh;
+        }
+        #instructions {
+            margin-top: 20px;
+            font-size: 0.8em;
+            overflow-y: auto;
         }
         .zoom-container {
             width: 100%;
@@ -99,12 +111,7 @@
     </div>
     <div id="main-content">
         <div id="visualization"></div>
-    </div>
-    <div id="instructions" style="display: flex; margin-top: 20px;">
-        <div id="sidebar" style="width: 250px; padding-right: 20px;">
-            <!-- Sidebar content remains unchanged -->
-        </div>
-        <div id="description" style="font-size: 0.8em; flex-grow: 1;">
+        <div id="instructions" style="margin-top: 20px; font-size: 0.8em;">
             <h3>IZA Distance Matrix Visualization</h3>
             <p>This visualization represents the IZA Distance Matrix, showing relationships between zeolite frameworks.</p>
             <h4>Features:</h4>

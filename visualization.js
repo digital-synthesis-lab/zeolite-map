@@ -1,5 +1,35 @@
 // Load the CSV file
 d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.csv").then(function(data) {
+    // Function to find the shortest path between two nodes
+    function findShortestPath(start, end) {
+        const queue = [[start]];
+        const visited = new Set([start]);
+
+        while (queue.length > 0) {
+            const path = queue.shift();
+            const node = path[path.length - 1];
+
+            if (node === end) {
+                return path;
+            }
+
+            for (const link of links) {
+                let next = null;
+                if (link.source.id === node) {
+                    next = link.target.id;
+                } else if (link.target.id === node) {
+                    next = link.source.id;
+                }
+
+                if (next && !visited.has(next)) {
+                    visited.add(next);
+                    queue.push([...path, next]);
+                }
+            }
+        }
+
+        return null; // No path found
+    }
     // Get labels from the first column
     const labels = data.map(row => row[Object.keys(row)[0]]);
 
@@ -153,6 +183,9 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
     function applySearch() {
         const searchTerms = d3.select("#search").property("value").toLowerCase().trim().split(/[\s,]+/).filter(Boolean);
         
+        // Reset path highlighting
+        link.attr("stroke", "#999").attr("stroke-width", 1);
+        
         // Highlight selected nodes
         node.classed("highlighted", d => searchTerms.length > 0 && searchTerms.some(term => d.label.toLowerCase().includes(term)));
         
@@ -204,6 +237,40 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     // Handle search
     d3.select("#search").on("input", applySearch);
+
+    // Handle path search
+    d3.select("#findPath").on("click", function() {
+        const pathLabels = d3.select("#pathSearch").property("value").toLowerCase().trim().split(",").map(s => s.trim());
+        if (pathLabels.length === 2) {
+            const startNode = nodes.find(n => n.label.toLowerCase() === pathLabels[0]);
+            const endNode = nodes.find(n => n.label.toLowerCase() === pathLabels[1]);
+            if (startNode && endNode) {
+                const path = findShortestPath(startNode.id, endNode.id);
+                highlightPath(path);
+            }
+        }
+    });
+
+    function highlightPath(path) {
+        // Reset previous highlighting
+        node.attr("fill", "#69b3a2");
+        link.attr("stroke", "#999").attr("stroke-width", 1);
+
+        if (path) {
+            // Highlight nodes in the path
+            node.filter(d => path.includes(d.id))
+                .attr("fill", "#ffa500"); // Orange for path nodes
+
+            // Highlight links in the path
+            link.filter(d => {
+                const sourceIndex = path.indexOf(d.source.id);
+                const targetIndex = path.indexOf(d.target.id);
+                return sourceIndex !== -1 && targetIndex !== -1 && Math.abs(sourceIndex - targetIndex) === 1;
+            })
+                .attr("stroke", "#ffa500") // Orange for path links
+                .attr("stroke-width", 3);
+        }
+    }
 
     // Initial graph update
     updateGraph(4);

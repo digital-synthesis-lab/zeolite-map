@@ -69,8 +69,11 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         .attr("class", "links")
         .selectAll("line");
 
-    // Calculate node size based on label length
-    const getNodeSize = (label) => Math.max(20, label.length * 4);
+    // Calculate node size based on label length and search status
+    const getNodeSize = (label, isSelected) => {
+        const baseSize = Math.max(20, label.length * 4);
+        return isSelected ? baseSize * 1.5 : baseSize;
+    };
 
     // Draw nodes
     const node = g.append("g")
@@ -78,7 +81,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         .selectAll("circle")
         .data(nodes)
         .enter().append("circle")
-        .attr("r", d => getNodeSize(d.label) / 2)
+        .attr("r", d => getNodeSize(d.label, false) / 2)
         .attr("fill", "#69b3a2");
 
     // Add labels inside nodes
@@ -107,6 +110,10 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         // Update forces
         simulation
             .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+            .force("charge", d3.forceManyBody().strength(-300))
+            .force("collide", d3.forceCollide().radius(d => getNodeSize(d.label, false) / 2 + 10))
+            .force("x", d3.forceX(width / 2).strength(0.1))
+            .force("y", d3.forceY(height / 2).strength(0.1))
             .alpha(1)
             .restart();
 
@@ -171,7 +178,7 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
         node.classed("neighbor", d => !searchTerms.some(term => d.label.toLowerCase().includes(term)) && highlightedNodes.has(d.id));
         link.classed("highlighted-link", l => highlightedLinks.has(l));
         
-        // Update node colors
+        // Update node colors and sizes
         node.attr("fill", d => {
             if (searchTerms.some(term => d.label.toLowerCase().includes(term))) {
                 return "#ff0000"; // Red for selected nodes
@@ -180,7 +187,19 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
             } else {
                 return "#69b3a2"; // Original color for other nodes
             }
+        })
+        .attr("r", d => getNodeSize(d.label, searchTerms.some(term => d.label.toLowerCase().includes(term))) / 2);
+
+        // Update label font sizes
+        label.attr("font-size", d => {
+            const nodeSize = getNodeSize(d.label, searchTerms.some(term => d.label.toLowerCase().includes(term)));
+            return Math.min(10, nodeSize / 3);
         });
+
+        // Update simulation to account for new node sizes
+        simulation.force("collide", d3.forceCollide().radius(d => getNodeSize(d.label, searchTerms.some(term => d.label.toLowerCase().includes(term))) / 2 + 10))
+            .alpha(0.3)
+            .restart();
     }
 
     // Handle search

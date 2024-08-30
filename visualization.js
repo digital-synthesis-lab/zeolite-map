@@ -61,7 +61,8 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
     // Create initial force simulation
     let simulation = d3.forceSimulation(nodes)
         .force("charge", d3.forceManyBody().strength(-30))
-        .force("center", d3.forceCenter(width / 2, height / 2));
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("repulsion", d3.forceLink().strength(-0.1).distance(100));
 
     // Initialize with 4 nearest neighbors
     let links = createLinks(4);
@@ -104,7 +105,17 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
             .attr("stroke-opacity", 0.6)
             .merge(link);
 
-        simulation.force("link", d3.forceLink(links).id(d => d.id).distance(d => d.distance * 10))
+        // Create a set of connected node pairs for quick lookup
+        const connectedPairs = new Set(links.map(d => `${d.source.id}-${d.target.id}`));
+
+        // Update forces
+        simulation
+            .force("link", d3.forceLink(links).id(d => d.id).distance(d => d.distance * 10))
+            .force("repulsion", d3.forceLink()
+                .links(d3.cross(nodes, nodes, (a, b) => a.id < b.id && !connectedPairs.has(`${a.id}-${b.id}`) ? {source: a, target: b} : null).filter(Boolean))
+                .strength(-0.1)
+                .distance(100)
+            )
             .alpha(1)
             .restart();
     }
@@ -139,8 +150,8 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
 
     // Handle search
     d3.select("#search").on("input", function() {
-        const searchTerms = this.value.toLowerCase().split(/[\s,]+/);
-        node.classed("highlighted", d => searchTerms.some(term => d.label.toLowerCase().includes(term)));
+        const searchTerms = this.value.toLowerCase().trim().split(/[\s,]+/).filter(Boolean);
+        node.classed("highlighted", d => searchTerms.length > 0 && searchTerms.some(term => d.label.toLowerCase().includes(term)));
     });
 
     // Initial graph update

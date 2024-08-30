@@ -142,7 +142,42 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
     // Handle search
     d3.select("#search").on("input", function() {
         const searchTerms = this.value.toLowerCase().trim().split(/[\s,]+/).filter(Boolean);
+        
+        // Highlight selected nodes
         node.classed("highlighted", d => searchTerms.length > 0 && searchTerms.some(term => d.label.toLowerCase().includes(term)));
+        
+        // Highlight neighbors and edges
+        const highlightedNodes = new Set();
+        const highlightedLinks = new Set();
+        
+        if (searchTerms.length > 0) {
+            nodes.forEach(d => {
+                if (searchTerms.some(term => d.label.toLowerCase().includes(term))) {
+                    highlightedNodes.add(d.id);
+                    links.forEach(l => {
+                        if (l.source.id === d.id || l.target.id === d.id) {
+                            highlightedLinks.add(l);
+                            highlightedNodes.add(l.source.id);
+                            highlightedNodes.add(l.target.id);
+                        }
+                    });
+                }
+            });
+        }
+        
+        node.classed("neighbor", d => !searchTerms.some(term => d.label.toLowerCase().includes(term)) && highlightedNodes.has(d.id));
+        link.classed("highlighted-link", l => highlightedLinks.has(l));
+        
+        // Update node colors
+        node.attr("fill", d => {
+            if (searchTerms.some(term => d.label.toLowerCase().includes(term))) {
+                return "#ff0000"; // Red for selected nodes
+            } else if (highlightedNodes.has(d.id)) {
+                return "#ff9999"; // Light red for neighbors
+            } else {
+                return "#69b3a2"; // Original color for other nodes
+            }
+        });
     });
 
     // Initial graph update

@@ -20,6 +20,16 @@
             background-color: #f0f0f0;
             height: 100vh;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        #sidebar-header {
+            padding: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20px;
         }
         #main-content {
             flex-grow: 1;
@@ -92,6 +102,9 @@
 </head>
 <body>
     <div id="sidebar">
+        <div id="sidebar-header">
+            Structural distance between IZA zeolites
+        </div>
         <div class="control-group">
             <label for="neighbors">Number of nearest neighbors: <span id="neighborValue">4</span></label>
             <input type="range" id="neighbors" min="2" max="8" value="4" step="1">
@@ -138,6 +151,7 @@
             </ol>
             <p>This visualization is based on the work described in the paper: <a href="https://doi.org/10.1039/D3DD00134B" target="_blank">https://doi.org/10.1039/D3DD00134B</a></p>
             <p>Author: Daniel Schwalbe-Koda</p>
+            <p><a href="https://america.iza-structure.org/IZA-SC/ftc_table.php" target="_blank">Link to IZA website</a></p>
         </div>
     </div>
     <script src="visualization.js"></script>

@@ -174,9 +174,15 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
     }
 
     // Handle neighbor selection
-    d3.select("#neighbors").on("change", function() {
+    d3.select("#neighbors").on("input", function() {
         const numNeighbors = parseInt(this.value);
+        d3.select("#neighborValue").text(numNeighbors);
         updateGraph(numNeighbors);
+    });
+
+    // Handle replot button
+    d3.select("#replot").on("click", function() {
+        simulation.alpha(1).restart();
     });
 
     // Apply search highlighting

@@ -99,6 +99,34 @@
     </div>
     <div id="main-content">
         <div id="visualization"></div>
+        <div id="description" style="font-size: 0.8em; margin-top: 20px;">
+            <h3>IZA Distance Matrix Visualization</h3>
+            <p>This visualization represents the IZA Distance Matrix, showing relationships between zeolite frameworks.</p>
+            <h4>Features:</h4>
+            <ul>
+                <li>Nodes represent zeolite frameworks, labeled with their IZA codes.</li>
+                <li>Links connect similar frameworks based on the selected number of nearest neighbors.</li>
+                <li>Node size is proportional to the length of its label.</li>
+            </ul>
+            <h4>Colors:</h4>
+            <ul>
+                <li>Default nodes: Green (#69b3a2)</li>
+                <li>Searched nodes: Red (#ff0000)</li>
+                <li>Neighbor nodes: Light red (#ff9999)</li>
+                <li>Path nodes: Orange fill (#ffa500) with red-orange outline (#ff4500)</li>
+                <li>Path links: Red-orange (#ff4500), dashed</li>
+            </ul>
+            <h4>Instructions:</h4>
+            <ol>
+                <li>Adjust the number of nearest neighbors using the slider.</li>
+                <li>Search for specific frameworks by entering labels in the search box.</li>
+                <li>Find the shortest path between two frameworks by entering their labels in the path search box.</li>
+                <li>Use the "Replot Graph" button to rearrange the layout.</li>
+                <li>Zoom and pan the visualization using your mouse or touchpad.</li>
+            </ol>
+            <p>This visualization is based on the work described in the paper: <a href="https://doi.org/10.1039/D3DD00134B" target="_blank">https://doi.org/10.1039/D3DD00134B</a></p>
+            <p>Author: Daniel Schwalbe-Koda</p>
+        </div>
     </div>
     <script src="visualization.js"></script>
 </body>

@@ -255,9 +255,18 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
                 highlightPath(path);
             } else {
                 console.log("One or both nodes not found");
+                highlightPath(null);
             }
         } else {
             console.log("Please enter exactly two labels");
+            highlightPath(null);
+        }
+    });
+
+    // Handle clearing of path search
+    d3.select("#pathSearch").on("input", function() {
+        if (this.value.trim() === "") {
+            highlightPath(null);
         }
     });
 
@@ -288,6 +297,24 @@ d3.csv("https://raw.githubusercontent.com/dskoda/Zeolites-AMD/main/data/iza_dm.c
                 .attr("stroke-dasharray", "5,5"); // Dashed line for path links
         }
     }
+
+    // Handle replot button
+    d3.select("#replot").on("click", function() {
+        simulation.alpha(1).restart();
+        const pathLabels = d3.select("#pathSearch").property("value").toLowerCase().trim().split(/[\s,]+/).filter(Boolean);
+        if (pathLabels.length === 2) {
+            const startNode = nodes.find(n => n.label.toLowerCase() === pathLabels[0]);
+            const endNode = nodes.find(n => n.label.toLowerCase() === pathLabels[1]);
+            if (startNode && endNode) {
+                const path = findShortestPath(startNode.id, endNode.id);
+                highlightPath(path);
+            } else {
+                highlightPath(null);
+            }
+        } else {
+            highlightPath(null);
+        }
+    });
 
     // Initial graph update
     updateGraph(4);
